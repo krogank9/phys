@@ -1,0 +1,61 @@
+<h1>Example</h1>
+<div id="unconstrainedMotion" style="width:640px;height:480px;float:left;" class="demo-placeholder"></div>
+
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="jquery.flot.js"></script>
+
+<script type="text/javascript" src="MV.js"></script>
+<script type="text/javascript" src="eq_constraints_phys.js"></script>
+
+
+<script>
+    /*
+        learning http://myselph.de/gamePhysics/equalityConstraints.html
+    */
+
+    var plot = $.plot("#unconstrainedMotion", [ [] ],
+                          {xaxis: {min:-10, max: 10}, yaxis: {min:-2, max:15}, colors: ['#000000']});
+    plot.draw();
+
+    function drawWorld(plotObject, world) {
+      var bodiesVertices = [];
+      for (var i=0; i<world.bodies.length; i++) {
+        var bodyVerts = world.bodies[i].getVerticesInWorldCoords();
+        bodyVerts.push(bodyVerts[0]);
+        bodiesVertices.push(bodyVerts);
+      }
+      plotObject.setData(bodiesVertices);
+      plotObject.draw();
+    }
+
+    var world = new World();
+    var ground = new Body([[10, -1], [0, -1], [-10, -1], [-10, 1], [10, 1]],
+                            [0, 15], 0, 0, 0, [0, 0], 0);
+    world.addBody(ground);
+    
+    var links = [];
+    var d=Math.sqrt(2)/2;
+    for (var i=0; i<=15; i++) {
+        var link = new Body([[0, -0.5], [-0.1, -0.3], [-0.1, 0.3], [0, 0.5], [0.1, 0.3], [0.1, -0.3]],
+                            [d/2+i*d, 14-d/2-i*d], Math.PI/4, 5, 5, [0, 0], 0);
+        link.addForce([0, -9.81]);
+        world.addBody(link);
+        links.push(link);
+    }
+            
+    var joint = new Joint(ground, 1, links[0], 3);
+    world.addJoint(joint);
+    world.addBody(links[0]);
+    for (var i=0; i<links.length-1; i++) {
+        var joint = new Joint(links[i], 0, links[i+1], 3);
+        world.addJoint(joint);
+    }
+    links[links.length-1].addForce([1, 0], 0);
+
+    function step() {
+        world.step()
+        drawWorld(plot, world)
+        setTimeout(step, world.dt*1000)
+    }    
+    step();
+</script>
