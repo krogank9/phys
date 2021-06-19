@@ -130,7 +130,7 @@ var World = function () {
                 MV.VmV(pA, pB)
                 .concat(MV.cross2(MV.VmV(pB, pA), MV.VmV(pA, cA)))
                 .concat(MV.VmV(pB, pA))
-                .concat(MV.cross2(MV.VmV(pA, pB), MV.VmV(pB, cB)))
+                .concat(MV.cross2(MV.VmV(pA, pB), MV.VmV(pB, cB))) // test
             )
 
             C = MV.dot(MV.VmV(pA, pB), MV.VmV(pA, pB))
